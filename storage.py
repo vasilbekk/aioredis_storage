@@ -71,6 +71,10 @@ class AbstractRedisStorage(ABC):
 
 		return keys
 
+	async def reset(self, *keys):
+		conn = await self.redis()
+		await conn.execute('DEL', *keys)
+
 
 
 
