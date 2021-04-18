@@ -1,6 +1,6 @@
 # Данная библиотека позволяет удобно работать с асинхронный Redis-хранилищем.
 Пример инициализации хранилища:
-```
+```python
 from aioredis_storage import RedisStorage
 
 storage = RedisStorage(
