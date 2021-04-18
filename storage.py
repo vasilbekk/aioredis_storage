@@ -49,7 +49,7 @@ class AbstractRedisStorage(ABC):
 		raw_data = await conn.execute('GET', await self.get_address(address))
 		return await self.load(raw_data)
 
-	async def get_all_addresses(self):
+	async def all_keys(self):
 		conn = await self.redis()
 		keys = await conn.execute('KEYS', f'{self._prefix}:*')
 		result = []
@@ -70,6 +70,7 @@ class AbstractRedisStorage(ABC):
 			await conn.execute('DEL', *keys)
 
 		return keys
+
 
 
 
