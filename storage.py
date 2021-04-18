@@ -37,16 +37,16 @@ class AbstractRedisStorage(ABC):
 
 		return self._redis
 
-	async def get_address(self, address: str) -> str:
-		return '%s%s%s' % (self._prefix, self._separator, address)
+	async def get_address(self, key: str) -> str:
+		return '%s%s%s' % (self._prefix, self._separator, key)
 
-	async def set_data(self, address: str, data: Any):
+	async def set_data(self, key: str, data: Any):
 		conn = await self.redis()
-		await conn.execute('SET', await self.get_address(address), await self.dump(data))
+		await conn.execute('SET', await self.get_address(key), await self.dump(data))
 
-	async def get_data(self, address: str):
+	async def get_data(self, key: str):
 		conn = await self.redis()
-		raw_data = await conn.execute('GET', await self.get_address(address))
+		raw_data = await conn.execute('GET', await self.get_address(key))
 		return await self.load(raw_data)
 
 	async def all_keys(self):
@@ -54,8 +54,8 @@ class AbstractRedisStorage(ABC):
 		keys = await conn.execute('KEYS', f'{self._prefix}:*')
 		result = []
 		for key in keys:
-			*_, address = key.decode('utf-8').split(self._separator)
-			result.append(address)
+			*_, key = key.decode('utf-8').split(self._separator)
+			result.append(key)
 
 		return result
 
