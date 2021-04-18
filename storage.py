@@ -5,6 +5,7 @@ import aioredis
 
 from .mixins import JSONMixin, PickleMixin
 
+DEFAULT_PREFIX = 'rs'
 
 class AbstractRedisStorage(ABC):
 
@@ -12,12 +13,15 @@ class AbstractRedisStorage(ABC):
 				db_name: str = 'localhost',
 				db_port: int = 6379,
 				db_number: int = None,
-				password: int = None):
+				password: int = None,
+				prefix: str = DEFAULT_PREFIX):
 		self._name = db_name
 		self._port = db_port
 		self._number = db_number
 		self._password = password
+		self._prefix = prefix
 		self._redis = None
+
 
 	async def redis(self):
 		if not self._redis:
@@ -29,17 +33,17 @@ class AbstractRedisStorage(ABC):
 
 		return self._redis
 
+	async def get_address(self, address: str) -> str:
+		return '%s:%s' % (self._prefix, address)
+
 	async def set_data(self, address: str, data: Any):
 		conn = await self.redis()
-		data = await self.dump(data)
-		await conn.execute('SET', address, data)
+		await conn.execute('SET', await self.get_address(address), await self.dump(data))
 
 	async def get_data(self, address: str):
 		conn = await self.redis()
-
-		raw_data = await conn.execute('GET', address)
-		data = await self.load(raw_data)
-		return data
+		raw_data = await conn.execute('GET', await self.get_address(address))
+		return await self.load(raw_data)
 
 
 class RedisStorage(AbstractRedisStorage, PickleMixin):
