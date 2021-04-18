@@ -37,6 +37,10 @@ class AbstractRedisStorage(ABC):
 
 		return self._redis
 
+	async def close(self):
+		if self._redis and not self._redis.closed:
+			self._redis.close()
+
 	async def get_address(self, key: str) -> str:
 		return '%s%s%s' % (self._prefix, self._separator, key)
 
