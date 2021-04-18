@@ -1,11 +1,12 @@
+from abc import ABC
 from typing import Any
 
 import aioredis
 
-from .mixins import PickleMixin
+from .mixins import JSONMixin, PickleMixin
 
 
-class RedisStorage(PickleMixin):
+class AbstractRedisStorage(ABC):
 
 	def __init__(self,
 				db_name: str = 'localhost',
@@ -39,3 +40,10 @@ class RedisStorage(PickleMixin):
 		raw_data = await conn.execute('GET', address)
 		data = await self.load(raw_data)
 		return data
+
+
+class RedisStorage(AbstractRedisStorage, PickleMixin):
+	pass
+
+class RedisJSONStorage(AbstractRedisStorage, JSONMixin):
+	pass
