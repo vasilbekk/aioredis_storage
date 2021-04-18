@@ -24,6 +24,7 @@ await storage.get_data(address = 'str_addr')
 Данный пример позволяет хранить все данные сериализованными pickle
 ```python
 from aioredis_storage.mixins import AbstractMixin
+from aioredis_storage.storage import AbstractRedisStorage
 
 class PickleMixin(AbstractMixin):
 
@@ -33,4 +34,10 @@ class PickleMixin(AbstractMixin):
 	async def dump(self, data) -> str:
 		return pickle.dumps(data)
 
+
+class RedisPickleStorage(AbstractRedisStorage, PickleMixin):
+	pass
+
 ```
+
+По умолчанию хранилище работает с `PickleMixin`, но вы можете использовать `JSONMixin`, `BaseMixin` при необходимости.
